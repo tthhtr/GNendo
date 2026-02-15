@@ -1,0 +1,1789 @@
+import React, { useEffect, useMemo, useState } from "react";
+// logo removed per request
+
+const PRACTICE = {
+  name: "Gurpreet Narula Dental Corporation",
+  tagline: "Trusted Endodontic Care in San Jose",
+  doctor: "Dr. Gurpreet Narula, DDS",
+  phoneDisplay: "(408) 929-3636",
+  phoneHref: "tel:+14089293636",
+  addressLines: ["150 N Jackson Ave #212", "San Jose, CA 95116"],
+  directionsHref:
+    "https://www.google.com/maps/dir/?api=1&destination=150+N+Jackson+Ave+%23212,+San+Jose,+CA+95116",
+  mapEmbedSrc:
+    "https://www.google.com/maps?q=150%20N%20Jackson%20Ave%20%23212%2C%20San%20Jose%2C%20CA%2095116&output=embed",
+  hours: [
+    { days: "Mon–Thu", hours: "9:00am – 6:00pm" },
+    { days: "Fri", hours: "9:00am – 5:00pm" },
+    { days: "Sat", hours: "Closed" },
+    { days: "Sun", hours: "Closed" },
+  ],
+};
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!mql) return;
+    const onChange = () => setReduced(Boolean(mql.matches));
+    onChange();
+    mql.addEventListener?.("change", onChange);
+    return () => mql.removeEventListener?.("change", onChange);
+  }, []);
+  return reduced;
+}
+
+function scrollToId(id, prefersReducedMotion) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+}
+
+const DentalSite = () => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const year = useMemo(() => new Date().getFullYear(), []);
+
+  const onNavClick = (e, id) => {
+    e.preventDefault();
+    scrollToId(id, prefersReducedMotion);
+  };
+
+  return (
+    <div data-testid="site-root" className="site-root">
+      {/* Internal CSS (requested: pure HTML + CSS styling) */}
+      <style>{`
+        :root{
+          --bg: #FFFFFF;
+          --surface: #FFFFFF;
+          --surface-2: #EEF4FF;
+          --ink: #0F172A;
+          --ink-2: #334155;
+          --muted: #64748B;
+          --line: #E2E8F0;
+          --blue-900: #0B2545;
+          --blue-800: #123A63;
+          --blue-700: #1E4F86;
+          --focus: rgba(30, 79, 134, 0.28);
+          --shadow: 0 14px 40px rgba(11, 37, 69, 0.10);
+          --shadow-soft: 0 10px 30px rgba(11, 37, 69, 0.08);
+          --radius: 18px;
+          --radius-sm: 14px;
+          --max: 1160px;
+        }
+
+        *{ box-sizing: border-box; }
+        html{ scroll-behavior: smooth; }
+        @media (prefers-reduced-motion: reduce){
+          html{ scroll-behavior: auto; }
+        }
+
+        body{ margin:0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+        ::selection{ background: rgba(30,79,134,0.18); }
+
+        a{ color: inherit; text-decoration: none; }
+        a:hover{ text-decoration: none; }
+
+        .container{ width: min(var(--max), calc(100% - 40px)); margin: 0 auto; }
+        @media (max-width: 640px){ .container{ width: calc(100% - 28px); } }
+
+        .skip-link{
+          position:absolute;
+          top: 10px; left: 10px;
+          transform: translateY(-160%);
+          background: var(--surface);
+          border: 1px solid var(--line);
+          padding: 10px 12px;
+          border-radius: 999px;
+          box-shadow: var(--shadow-soft);
+          z-index: 999;
+        }
+        .skip-link:focus{ transform: translateY(0); outline: none; box-shadow: 0 0 0 6px var(--focus), var(--shadow-soft); }
+
+        .topbar{
+          position: sticky; top: 0; z-index: 50;
+          background: rgba(255,255,255,0.82);
+          backdrop-filter: blur(18px);
+          border-top: 1px solid rgba(226,232,240,0.9);
+          border-bottom: 1px solid rgba(226,232,240,0.9);
+        }
+        .topbar-inner{
+          display:flex; align-items:center; justify-content:space-between;
+          padding: 14px 0;
+          gap: 16px;
+        }
+
+        .brand{
+          display:flex;
+          flex-direction:column;
+          gap: 2px;
+          min-width: 210px;
+        }
+        .brand-name{ font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 16px; color: var(--blue-900); line-height: 1.1; }
+        .brand-sub{ font-size: 12px; color: var(--muted); }
+
+        .nav{
+          display:flex; align-items:center; gap: 14px;
+          padding: 6px 8px;
+          border: 1px solid rgba(226,232,240,0.9);
+          border-radius: 999px;
+          background: rgba(255,255,255,0.7);
+        }
+        .nav a{
+          font-size: 13px;
+          color: var(--ink-2);
+          padding: 8px 10px;
+          border-radius: 999px;
+          transition: background-color 180ms ease, color 180ms ease;
+        }
+        .nav a:hover{ background: rgba(238,244,255,0.9); color: var(--blue-900); }
+        .nav a:focus{ outline: none; box-shadow: 0 0 0 6px var(--focus); }
+        @media (max-width: 960px){ .nav{ display:none; } }
+
+        .header-cta{
+          display:flex; align-items:center; gap: 10px;
+        }
+
+        .btn{
+          display:inline-flex; align-items:center; justify-content:center;
+          gap: 10px;
+          padding: 12px 16px;
+          border-radius: 999px;
+          border: 1px solid transparent;
+          font-weight: 650;
+          font-size: 13px;
+          letter-spacing: -0.01em;
+          transition: background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
+          cursor: pointer;
+          user-select:none;
+          white-space: nowrap;
+        }
+        .btn:focus{ outline:none; box-shadow: 0 0 0 6px var(--focus); }
+        .btn-primary{ background: var(--blue-900); color: #fff; box-shadow: 0 10px 24px rgba(11,37,69,0.18); }
+        .btn-primary:hover{ background: var(--blue-800); box-shadow: 0 16px 34px rgba(11,37,69,0.22); transform: translateY(-1px); }
+        .btn-secondary{ background: rgba(255,255,255,0.85); color: var(--blue-900); border-color: rgba(11,37,69,0.22); }
+        .btn-secondary:hover{ background: rgba(238,244,255,1); border-color: rgba(11,37,69,0.32); transform: translateY(-1px); }
+
+        .hero{
+          padding: 46px 0 28px;
+          background:
+            radial-gradient(900px 380px at 20% -20%, rgba(238,244,255,0.85), rgba(255,255,255,0) 60%),
+            radial-gradient(820px 360px at 100% 0%, rgba(238,244,255,0.7), rgba(255,255,255,0) 62%);
+        }
+        .hero-grid{
+          display:grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: 26px;
+          align-items: stretch;
+        }
+        @media (max-width: 920px){
+          .hero-grid{ grid-template-columns: 1fr; }
+        }
+
+        .hero-card{
+          background: rgba(255,255,255,0.9);
+          border: 1px solid rgba(226,232,240,0.9);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          padding: 26px;
+          overflow:hidden;
+          position: relative;
+        }
+
+        .kicker{
+          display:flex; gap: 8px; align-items:center;
+          font-size: 12px;
+          color: var(--muted);
+          letter-spacing: 0.01em;
+        }
+        .kicker-dot{ width: 8px; height: 8px; border-radius: 999px; background: rgba(30,79,134,0.22); border: 1px solid rgba(30,79,134,0.30); }
+
+        h1{
+          margin: 12px 0 10px;
+          font-family: Manrope, Inter, system-ui, sans-serif;
+          font-size: 44px;
+          line-height: 1.06;
+          letter-spacing: -0.03em;
+          color: var(--blue-900);
+        }
+        @media (max-width: 640px){ h1{ font-size: 36px; } }
+
+        .hero-tagline{
+          font-size: 18px;
+          color: var(--ink-2);
+          line-height: 1.55;
+          margin: 0 0 16px;
+          max-width: 52ch;
+        }
+
+        .hero-badges{
+          display:flex; flex-wrap:wrap; gap: 10px;
+          margin: 18px 0 18px;
+        }
+        .badge{
+          display:inline-flex; align-items:center; gap: 8px;
+          padding: 10px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(226,232,240,0.95);
+          background: rgba(248,250,252,0.92);
+          color: var(--ink-2);
+          font-size: 13px;
+        }
+
+        .hero-actions{ display:flex; gap: 12px; flex-wrap:wrap; margin-top: 18px; }
+
+        .hero-side{
+          border-radius: var(--radius);
+          overflow:hidden;
+          border: 1px solid rgba(226,232,240,0.9);
+          background: #F8FAFC;
+          box-shadow: var(--shadow-soft);
+          position: relative;
+          min-height: 340px;
+        }
+        .hero-img{
+          width: 100%; height: 100%;
+          object-fit: cover;
+          /* Keep the crop focused on the smile/teeth */
+          object-position: 50% 84%;
+          transform: scale(1.16);
+          transform-origin: 50% 65%;
+          display:block;
+          filter: saturate(1.18) contrast(1.06) brightness(1.06);
+        }
+        .hero-overlay{
+          position:absolute; inset: 0;
+          background: linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.78));
+          pointer-events:none;
+        }
+        .hero-side-card{
+          position:absolute; left: 14px; right: 14px; bottom: 14px;
+          background: rgba(255,255,255,0.86);
+          backdrop-filter: blur(18px);
+          border: 1px solid rgba(226,232,240,0.95);
+          border-radius: 16px;
+          padding: 14px;
+          display:flex; gap: 12px; align-items: flex-start;
+        }
+        .hero-side-card strong{ font-family: Manrope, Inter, system-ui, sans-serif; color: var(--blue-900); }
+        .hero-side-card p{ margin: 4px 0 0; font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+        .section{
+          padding: 54px 0;
+        }
+        .section.alt{ background: var(--surface-2); }
+
+        .section-head{
+          display:flex; align-items:flex-end; justify-content:space-between; gap: 18px;
+          margin-bottom: 20px;
+        }
+        .section h2{
+          margin: 0;
+          font-family: Manrope, Inter, system-ui, sans-serif;
+          font-size: 28px;
+          letter-spacing: -0.02em;
+          color: var(--blue-900);
+        }
+        .section .lead{
+          margin: 0;
+          color: var(--muted);
+          max-width: 64ch;
+          line-height: 1.6;
+          font-size: 15px;
+        }
+
+        .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+        @media (max-width: 880px){ .grid-2{ grid-template-columns: 1fr; } }
+
+        .card{
+          background: var(--surface);
+          border: 1px solid rgba(226,232,240,0.95);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-soft);
+          padding: 22px;
+        }
+
+        .about-wrap{ display:grid; grid-template-columns: 0.95fr 1.05fr; gap: 22px; align-items: stretch; }
+        @media (max-width: 920px){ .about-wrap{ grid-template-columns: 1fr; } }
+
+        .about-img{
+          border-radius: var(--radius);
+          overflow:hidden;
+          border: 1px solid rgba(226,232,240,0.9);
+          box-shadow: var(--shadow-soft);
+          background: #F8FAFC;
+          min-height: 320px;
+        }
+        .about-img img{ width:100%; height:100%; object-fit: cover; display:block; }
+
+        .about-body h3{
+          margin: 0 0 10px;
+          font-family: Manrope, Inter, system-ui, sans-serif;
+          font-size: 18px;
+          letter-spacing: -0.01em;
+          color: var(--ink);
+        }
+        .about-body p{ margin: 0 0 12px; color: var(--ink-2); line-height: 1.7; }
+        .about-body .sig{ font-family: "Libre Baskerville", Georgia, serif; color: var(--blue-900); margin-top: 12px; }
+
+        .services-grid{
+          display:grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+        }
+        @media (max-width: 1100px){ .services-grid{ grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px){ .services-grid{ grid-template-columns: 1fr; } }
+
+        .service{
+          padding: 18px;
+          border-radius: var(--radius);
+          border: 1px solid rgba(226,232,240,0.95);
+          background: rgba(255,255,255,0.95);
+          box-shadow: 0 10px 24px rgba(11,37,69,0.06);
+          transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
+          min-height: 156px;
+        }
+        .service:hover{ transform: translateY(-2px); border-color: rgba(30,79,134,0.22); box-shadow: 0 18px 40px rgba(11,37,69,0.10); }
+        .service h3{ margin: 0 0 8px; font-family: Manrope, Inter, system-ui, sans-serif; font-size: 16px; color: var(--blue-900); }
+        .service p{ margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+
+        .why-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        @media (max-width: 760px){ .why-grid{ grid-template-columns: 1fr; } }
+        .why-item{
+          display:flex; gap: 12px; align-items:flex-start;
+          padding: 18px;
+          border-radius: var(--radius);
+          border: 1px solid rgba(226,232,240,0.95);
+          background: rgba(255,255,255,0.9);
+        }
+        .why-icon{
+          width: 38px; height: 38px;
+          border-radius: 12px;
+          background: rgba(238,244,255,0.95);
+          border: 1px solid rgba(30,79,134,0.16);
+          display:flex; align-items:center; justify-content:center;
+          flex: 0 0 auto;
+        }
+        .why-item strong{ display:block; font-family: Manrope, Inter, system-ui, sans-serif; color: var(--ink); font-size: 15px; }
+        .why-item span{ display:block; color: var(--muted); font-size: 14px; margin-top: 4px; line-height: 1.55; }
+
+        .reviews-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media (max-width: 980px){ .reviews-grid{ grid-template-columns: 1fr; } }
+        .review{
+          background: rgba(248,250,252,0.94);
+          border: 1px solid rgba(226,232,240,0.95);
+          border-radius: var(--radius);
+          padding: 18px;
+          position: relative;
+          overflow:hidden;
+        }
+        .review:before{
+          content:"“";
+          position:absolute;
+          top: -8px; left: 12px;
+          font-family: "Libre Baskerville", Georgia, serif;
+          font-size: 64px;
+          color: rgba(11,37,69,0.10);
+          line-height: 1;
+        }
+        .review p{ margin: 18px 0 14px; color: var(--ink-2); line-height: 1.7; }
+        .review-meta{ display:flex; align-items:center; justify-content:space-between; gap: 12px; }
+        .stars{ letter-spacing: 0.12em; color: #B45309; font-size: 12px; }
+        .source{ font-size: 12px; color: var(--muted); }
+
+        .contact-wrap{ display:grid; grid-template-columns: 0.9fr 1.1fr; gap: 18px; align-items: stretch; }
+        @media (max-width: 920px){ .contact-wrap{ grid-template-columns: 1fr; } }
+
+        .contact-card{
+          background: rgba(255,255,255,0.9);
+          border: 1px solid rgba(226,232,240,0.95);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-soft);
+          padding: 20px;
+        }
+        .contact-row{ display:flex; align-items:flex-start; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px dashed rgba(226,232,240,0.9); }
+        .contact-row:last-child{ border-bottom: none; }
+        .label{ font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .value{ font-size: 15px; color: var(--ink); line-height: 1.5; }
+        .value a{ color: var(--blue-900); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+        .value a:hover{ color: var(--blue-800); }
+
+        .map{
+          border-radius: var(--radius);
+          overflow:hidden;
+          border: 1px solid rgba(226,232,240,0.95);
+          box-shadow: var(--shadow-soft);
+          background: #fff;
+          min-height: 360px;
+        }
+        .map iframe{ width: 100%; height: 100%; border: 0; display:block; }
+
+        footer{
+          padding: 28px 0 86px;
+          background: #0B2545;
+          color: rgba(255,255,255,0.9);
+        }
+        footer .foot-grid{ display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; }
+        @media (max-width: 780px){ footer .foot-grid{ grid-template-columns: 1fr; } }
+        .foot-title{ font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; }
+        .foot-muted{ color: rgba(255,255,255,0.72); margin: 0; line-height: 1.6; }
+        .foot-links{ display:flex; flex-wrap:wrap; gap: 10px; justify-content:flex-end; }
+        @media (max-width: 780px){ .foot-links{ justify-content:flex-start; } }
+        .foot-links a{
+          color: rgba(255,255,255,0.86);
+          border: 1px solid rgba(255,255,255,0.16);
+          padding: 10px 12px;
+          border-radius: 999px;
+          transition: background-color 180ms ease, border-color 180ms ease;
+        }
+        .foot-links a:hover{ background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.24); }
+        .copyright{ margin-top: 14px; color: rgba(255,255,255,0.65); font-size: 12px; }
+
+        /* Mobile sticky CTA */
+        .mobile-cta{
+          position: fixed;
+          left: 12px; right: 12px; bottom: 12px;
+          z-index: 60;
+          display:none;
+          gap: 10px;
+        }
+        .mobile-cta a{ flex:1; }
+        @media (max-width: 960px){
+          .mobile-cta{ display:flex; }
+        }
+
+        /* No section fade-in (removed per request) */
+      `}</style>
+
+      <a
+        data-testid="skip-to-content-link"
+        href="#main"
+        className="skip-link"
+        onClick={(e) => onNavClick(e, "main")}
+      >
+        Skip to content
+      </a>
+
+      <header data-testid="topbar" className="topbar">
+        <div className="container">
+          <div className="topbar-inner">
+            <div className="brand" data-testid="brand-block">
+              <div className="brand-name" data-testid="practice-name">
+                {PRACTICE.name}
+              </div>
+              <div className="brand-sub" data-testid="practice-type-location">
+                Endodontist (Root Canal Specialist) • San Jose, California
+              </div>
+            </div>
+
+            <nav className="nav" aria-label="Primary" data-testid="primary-nav">
+              <a data-testid="nav-about" href="#about" onClick={(e) => onNavClick(e, "about")}>
+                About
+              </a>
+              <a
+                data-testid="nav-services"
+                href="#services"
+                onClick={(e) => onNavClick(e, "services")}
+              >
+                Services
+              </a>
+              <a data-testid="nav-why" href="#why" onClick={(e) => onNavClick(e, "why")}>
+                Why Choose Us
+              </a>
+              {/* Reviews are linked externally via Google Maps; no on-page reviews section */}
+              <a
+                data-testid="nav-contact"
+                href="#contact"
+                onClick={(e) => onNavClick(e, "contact")}
+              >
+                Contact
+              </a>
+            </nav>
+
+            <div className="header-cta" data-testid="header-cta">
+              <a
+                data-testid="header-call-now-button"
+                className="btn btn-primary"
+                href={PRACTICE.phoneHref}
+                aria-label={`Call ${PRACTICE.phoneDisplay}`}
+              >
+                Call Now
+              </a>
+              <a
+                data-testid="header-directions-button"
+                className="btn btn-secondary"
+                href={PRACTICE.directionsHref}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Get directions"
+              >
+                Get Directions
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main id="main" data-testid="main">
+        <section data-testid="hero-section" className="hero" aria-label="Hero">
+          <div className="container">
+            <div className="hero-grid">
+              <div className="hero-card">
+                <div className="kicker" data-testid="hero-kicker">
+                  <span className="kicker-dot" aria-hidden="true" />
+                  Precision endodontics • Compassionate care
+                </div>
+                <h1 data-testid="hero-heading">{PRACTICE.tagline}</h1>
+                <p data-testid="hero-subheading" className="hero-tagline">
+                  Specialist-led care focused on relieving pain, saving natural teeth, and providing a calm,
+                  professional experience—right here in San Jose.
+                </p>
+
+                <div className="hero-badges" data-testid="hero-badges">
+                  <div className="badge" data-testid="badge-specialist">
+                    Root Canal Specialist
+                  </div>
+                  <div className="badge" data-testid="badge-doctor-credential">
+                    {PRACTICE.doctor}
+                  </div>
+                  <div className="badge" data-testid="badge-location">
+                    Convenient San Jose Location
+                  </div>
+                </div>
+
+                <div className="hero-actions" data-testid="hero-cta-buttons">
+                  <a
+                    data-testid="hero-call-now-button"
+                    className="btn btn-primary"
+                    href={PRACTICE.phoneHref}
+                    aria-label={`Call ${PRACTICE.phoneDisplay}`}
+                  >
+                    Call Now
+                  </a>
+                  <a
+                    data-testid="hero-directions-button"
+                    className="btn btn-secondary"
+                    href={PRACTICE.directionsHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Get directions"
+                  >
+                    Get Directions
+                  </a>
+                </div>
+              </div>
+
+              <aside data-testid="hero-image-panel" className="hero-side" aria-label="Clinic imagery">
+                <img
+                  data-testid="hero-image"
+                  className="hero-img"
+                  src="https://images.unsplash.com/photo-1769559893692-c6d0623bf8e4?auto=format&fit=crop&w=1400&q=80"
+                  alt="Close-up smiling mouth with lipstick"
+                  loading="lazy"
+                  width="1400"
+                  height="1000"
+                />
+                <div className="hero-overlay" aria-hidden="true" />
+                <div data-testid="hero-info-card" className="hero-side-card">
+                  <div aria-hidden="true" className="why-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2v6" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M12 16v6" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M4 12h6" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M14 12h6" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M12 16a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z" stroke="#0B2545" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong data-testid="hero-info-title">Modern technology, meticulous technique</strong>
+                    <p data-testid="hero-info-text">
+                      We combine advanced diagnostics with a patient-first approach to support comfortable, efficient care.
+                    </p>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section id="about" data-testid="about-section" className="section" aria-label="About us">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 data-testid="about-heading">About Us</h2>
+                <p data-testid="about-lead" className="lead">
+                  Learn more about our commitment to compassionate, expert endodontic care.
+                </p>
+              </div>
+            </div>
+
+            <div className="about-wrap">
+              <div className="about-img" data-testid="about-image-wrap" aria-label="Dental office interior">
+                <img
+                  data-testid="about-image"
+                  src="https://images.unsplash.com/photo-1704455306251-b4634215d98f?auto=format&fit=crop&w=1400&q=80"
+                  alt="Modern, clean dental office interior"
+                  loading="lazy"
+                  width="1400"
+                  height="1000"
+                />
+              </div>
+
+              <div className="card about-body" data-testid="about-card">
+                <h3 data-testid="about-doctor-name">{PRACTICE.doctor}</h3>
+                <p data-testid="about-paragraph-1">
+                  Dr. Gurpreet Narula, DDS provides specialist-focused endodontic care for patients seeking relief from tooth pain
+                  and treatment designed to preserve natural teeth through precise, thoughtful care.
+                </p>
+                <p data-testid="about-paragraph-2">
+                  Our approach is grounded in careful diagnosis, meticulous technique, and clear communication—so you understand
+                  your options, know what to expect, and feel supported from consultation through follow-up.
+                </p>
+                <p data-testid="about-education">
+                  He earned his dental degree from New York University (NYU) in 2001, completed two years of residency training in
+                  general dentistry, and then advanced his clinical expertise through specialty training in endodontics at NYU,
+                  graduating in 2005.
+                </p>
+                <p data-testid="about-paragraph-3">
+                  Whether you’re referred for root canal therapy or need an urgent endodontic evaluation, our team is here to
+                  provide timely, professional care focused on long-term comfort and outcomes.
+                </p>
+                <div data-testid="about-signature" className="sig">
+                  — {PRACTICE.doctor}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="services" data-testid="services-section" className="section alt" aria-label="Services">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 data-testid="services-heading">Services</h2>
+                <p data-testid="services-lead" className="lead">
+                  Specialized endodontic services for diagnosis, treatment, and emergency care.
+                </p>
+              </div>
+            </div>
+
+            <div className="services-grid" data-testid="services-grid">
+              <article className="service" data-testid="service-root-canal-therapy">
+                <h3>Root Canal Therapy</h3>
+                <p>Remove infection, reduce pain, and help preserve your natural tooth with precise, specialist-led care.</p>
+              </article>
+              <article className="service" data-testid="service-endodontic-retreatment">
+                <h3>Endodontic Retreatment & Microsurgery</h3>
+                <p>Re-evaluate and treat previously treated teeth to address persistent symptoms or new infection.</p>
+              </article>
+              <article className="service" data-testid="service-emergency-dental-care">
+                <h3>Emergency Dental Care</h3>
+                <p>Prompt evaluation for swelling, severe toothache, and other urgent endodontic concerns.</p>
+              </article>
+              <article className="service" data-testid="service-pain-diagnosis">
+                <h3>Pain Diagnosis</h3>
+                <p>Advanced diagnostic assessment to locate the source of pain and recommend the right treatment.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="why" data-testid="why-section" className="section" aria-label="Why choose us">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 data-testid="why-heading">Why Choose Us</h2>
+                <p data-testid="why-lead" className="lead">
+                  A calm, professional environment and specialist-level expertise focused on patient comfort.
+                </p>
+              </div>
+            </div>
+
+            <div className="why-grid" data-testid="why-grid">
+              <div className="why-item" data-testid="why-experienced-specialist">
+                <div className="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 21h8" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M12 17v4" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M7 10a5 5 0 1 1 10 0c0 2.1-1.1 3.1-2.1 4.1c-.8.8-1.4 1.4-1.7 2.4h-2.4c-.3-1-.9-1.6-1.7-2.4C8.1 13.1 7 12.1 7 10Z" stroke="#1E4F86" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Experienced Specialist</strong>
+                  <span>Endodontic-focused care tailored to complex root canal needs and pain relief.</span>
+                </div>
+              </div>
+
+              <div className="why-item" data-testid="why-modern-technology">
+                <div className="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 7h16" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M7 4v6" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M17 4v6" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M6 20h12a2 2 0 0 0 2-2v-6H4v6a2 2 0 0 0 2 2Z" stroke="#1E4F86" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Modern Technology</strong>
+                  <span>Advanced tools and careful technique for accurate diagnosis and efficient treatment.</span>
+                </div>
+              </div>
+
+              <div className="why-item" data-testid="why-patient-focused-care">
+                <div className="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 21s-7-4.5-9-9a5.5 5.5 0 0 1 9-6a5.5 5.5 0 0 1 9 6c-2 4.5-9 9-9 9Z" stroke="#1E4F86" strokeWidth="2"/>
+                    <path d="M12 7v6" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M9 10h6" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Patient-Focused Care</strong>
+                  <span>Clear explanations, gentle chairside manner, and comfort-oriented treatment planning.</span>
+                </div>
+              </div>
+
+              <div className="why-item" data-testid="why-convenient-location">
+                <div className="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22s7-5 7-12a7 7 0 1 0-14 0c0 7 7 12 7 12Z" stroke="#1E4F86" strokeWidth="2"/>
+                    <path d="M12 11a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z" stroke="#0B2545" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Convenient San Jose Location</strong>
+                  <span>Easy-to-reach office near you, with quick access to directions and click-to-call support.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Reviews section removed per request; link to Google Maps reviews is in the footer. */}
+
+        <section id="contact" data-testid="contact-section" className="section" aria-label="Contact">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 data-testid="contact-heading">Contact</h2>
+                <p data-testid="contact-lead" className="lead">
+                  Call to schedule an appointment, or use directions to find us.
+                </p>
+              </div>
+            </div>
+
+            <div className="contact-wrap">
+              <div className="contact-card" data-testid="contact-card">
+                <div className="contact-row" data-testid="contact-address-row">
+                  <div>
+                    <div className="label">Address</div>
+                    <div className="value" data-testid="contact-address">
+                      <div>{PRACTICE.addressLines[0]}</div>
+                      <div>{PRACTICE.addressLines[1]}</div>
+                    </div>
+                  </div>
+                  <a
+                    data-testid="contact-directions-link"
+                    className="btn btn-secondary"
+                    href={PRACTICE.directionsHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Get directions"
+                  >
+                    Directions
+                  </a>
+                </div>
+
+                <div className="contact-row" data-testid="contact-phone-row">
+                  <div>
+                    <div className="label">Phone</div>
+                    <div className="value" data-testid="contact-phone">
+                      <a href={PRACTICE.phoneHref} aria-label={`Call ${PRACTICE.phoneDisplay}`}>
+                        {PRACTICE.phoneDisplay}
+                      </a>
+                    </div>
+                  </div>
+                  <a
+                    data-testid="contact-call-now-button"
+                    className="btn btn-primary"
+                    href={PRACTICE.phoneHref}
+                    aria-label={`Call ${PRACTICE.phoneDisplay}`}
+                  >
+                    Call
+                  </a>
+                </div>
+
+                <div className="contact-row" data-testid="contact-hours-row">
+                  <div style={{ width: "100%" }}>
+                    <div className="label">Office Hours</div>
+                    <div className="value" data-testid="contact-hours">
+                      {PRACTICE.hours.map((h) => (
+                        <div key={h.days} data-testid={`office-hours-${h.days.replace(/\s/g, "").toLowerCase()}`}>
+                          {h.days}: {h.hours}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="contact-row" data-testid="contact-note-row">
+                  <div style={{ width: "100%" }}>
+                    <div className="label">New Patients</div>
+                    <div className="value" data-testid="contact-note">
+                      If you are in pain, please call us to schedule an emergency appointment.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="map" data-testid="google-map-embed">
+                <iframe
+                  title="Google Map - Gurpreet Narula Dental Corporation"
+                  src={PRACTICE.mapEmbedSrc}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer data-testid="footer">
+          <div className="container">
+            <div className="foot-grid">
+              <div>
+                <p className="foot-title" data-testid="footer-practice-name">
+                  {PRACTICE.name}
+                </p>
+                <p className="foot-muted" data-testid="footer-address">
+                  {PRACTICE.addressLines[0]}, {PRACTICE.addressLines[1]}
+                </p>
+                <p className="foot-muted" data-testid="footer-phone">
+                  Phone: {PRACTICE.phoneDisplay}
+                </p>
+                <div className="copyright" data-testid="footer-copyright">
+                  © {year} {PRACTICE.name}. All rights reserved.
+                </div>
+              </div>
+
+              <div className="foot-links" data-testid="footer-links">
+                <a
+                  data-testid="footer-reviews-link"
+                  href={PRACTICE.directionsHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Open map directions"
+                >
+                  Get Directions
+                </a>
+                <a data-testid="footer-back-to-top" href="#main" onClick={(e) => onNavClick(e, "main")}>
+                  Back to Top
+                </a>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+        {/* Mobile sticky CTA removed per request (CTAs remain in header/hero/contact). */}
+        <div className="mobile-cta" data-testid="mobile-sticky-cta" style={{ display: "none" }} />
+      </main>
+    </div>
+  );
+};
+
+export default function App() {
+  return <DentalSite />;
+}import React, { useEffect, useMemo, useState } from "react";
+// logo removed per request
+
+const PRACTICE = {
+  name: "Gurpreet Narula Dental Corporation",
+  tagline: "Trusted Endodontic Care in San Jose",
+  doctor: "Dr. Gurpreet Narula, DDS",
+  phoneDisplay: "(408) 929-3636",
+  phoneHref: "tel:+14089293636",
+  addressLines: ["150 N Jackson Ave #212", "San Jose, CA 95116"],
+  directionsHref:
+    "https://www.google.com/maps/dir/?api=1&destination=150+N+Jackson+Ave+%23212,+San+Jose,+CA+95116",
+  mapEmbedSrc:
+    "https://www.google.com/maps?q=150%20N%20Jackson%20Ave%20%23212%2C%20San%20Jose%2C%20CA%2095116&output=embed",
+  hours: [
+    { days: "Mon–Thu", hours: "9:00am – 6:00pm" },
+    { days: "Fri", hours: "9:00am – 5:00pm" },
+    { days: "Sat", hours: "Closed" },
+    { days: "Sun", hours: "Closed" },
+  ],
+};
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!mql) return;
+    const onChange = () => setReduced(Boolean(mql.matches));
+    onChange();
+    mql.addEventListener?.("change", onChange);
+    return () => mql.removeEventListener?.("change", onChange);
+  }, []);
+  return reduced;
+}
+
+function scrollToId(id, prefersReducedMotion) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+}
+
+const DentalSite = () => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const year = useMemo(() => new Date().getFullYear(), []);
+
+  const onNavClick = (e, id) => {
+    e.preventDefault();
+    scrollToId(id, prefersReducedMotion);
+  };
+
+  return (
+    <div data-testid="site-root" className="site-root">
+      {/* Internal CSS (requested: pure HTML + CSS styling) */}
+      <style>{`
+        :root{
+          --bg: #FFFFFF;
+          --surface: #FFFFFF;
+          --surface-2: #EEF4FF;
+          --ink: #0F172A;
+          --ink-2: #334155;
+          --muted: #64748B;
+          --line: #E2E8F0;
+          --blue-900: #0B2545;
+          --blue-800: #123A63;
+          --blue-700: #1E4F86;
+          --focus: rgba(30, 79, 134, 0.28);
+          --shadow: 0 14px 40px rgba(11, 37, 69, 0.10);
+          --shadow-soft: 0 10px 30px rgba(11, 37, 69, 0.08);
+          --radius: 18px;
+          --radius-sm: 14px;
+          --max: 1160px;
+        }
+
+        *{ box-sizing: border-box; }
+        html{ scroll-behavior: smooth; }
+        @media (prefers-reduced-motion: reduce){
+          html{ scroll-behavior: auto; }
+        }
+
+        body{ margin:0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+        ::selection{ background: rgba(30,79,134,0.18); }
+
+        a{ color: inherit; text-decoration: none; }
+        a:hover{ text-decoration: none; }
+
+        .container{ width: min(var(--max), calc(100% - 40px)); margin: 0 auto; }
+        @media (max-width: 640px){ .container{ width: calc(100% - 28px); } }
+
+        .skip-link{
+          position:absolute;
+          top: 10px; left: 10px;
+          transform: translateY(-160%);
+          background: var(--surface);
+          border: 1px solid var(--line);
+          padding: 10px 12px;
+          border-radius: 999px;
+          box-shadow: var(--shadow-soft);
+          z-index: 999;
+        }
+        .skip-link:focus{ transform: translateY(0); outline: none; box-shadow: 0 0 0 6px var(--focus), var(--shadow-soft); }
+
+        .topbar{
+          position: sticky; top: 0; z-index: 50;
+          background: rgba(255,255,255,0.82);
+          backdrop-filter: blur(18px);
+          border-top: 1px solid rgba(226,232,240,0.9);
+          border-bottom: 1px solid rgba(226,232,240,0.9);
+        }
+        .topbar-inner{
+          display:flex; align-items:center; justify-content:space-between;
+          padding: 14px 0;
+          gap: 16px;
+        }
+
+        .brand{
+          display:flex;
+          flex-direction:column;
+          gap: 2px;
+          min-width: 210px;
+        }
+        .brand-name{ font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 16px; color: var(--blue-900); line-height: 1.1; }
+        .brand-sub{ font-size: 12px; color: var(--muted); }
+
+        .nav{
+          display:flex; align-items:center; gap: 14px;
+          padding: 6px 8px;
+          border: 1px solid rgba(226,232,240,0.9);
+          border-radius: 999px;
+          background: rgba(255,255,255,0.7);
+        }
+        .nav a{
+          font-size: 13px;
+          color: var(--ink-2);
+          padding: 8px 10px;
+          border-radius: 999px;
+          transition: background-color 180ms ease, color 180ms ease;
+        }
+        .nav a:hover{ background: rgba(238,244,255,0.9); color: var(--blue-900); }
+        .nav a:focus{ outline: none; box-shadow: 0 0 0 6px var(--focus); }
+        @media (max-width: 960px){ .nav{ display:none; } }
+
+        .header-cta{
+          display:flex; align-items:center; gap: 10px;
+        }
+
+        .btn{
+          display:inline-flex; align-items:center; justify-content:center;
+          gap: 10px;
+          padding: 12px 16px;
+          border-radius: 999px;
+          border: 1px solid transparent;
+          font-weight: 650;
+          font-size: 13px;
+          letter-spacing: -0.01em;
+          transition: background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
+          cursor: pointer;
+          user-select:none;
+          white-space: nowrap;
+        }
+        .btn:focus{ outline:none; box-shadow: 0 0 0 6px var(--focus); }
+        .btn-primary{ background: var(--blue-900); color: #fff; box-shadow: 0 10px 24px rgba(11,37,69,0.18); }
+        .btn-primary:hover{ background: var(--blue-800); box-shadow: 0 16px 34px rgba(11,37,69,0.22); transform: translateY(-1px); }
+        .btn-secondary{ background: rgba(255,255,255,0.85); color: var(--blue-900); border-color: rgba(11,37,69,0.22); }
+        .btn-secondary:hover{ background: rgba(238,244,255,1); border-color: rgba(11,37,69,0.32); transform: translateY(-1px); }
+
+        .hero{
+          padding: 46px 0 28px;
+          background:
+            radial-gradient(900px 380px at 20% -20%, rgba(238,244,255,0.85), rgba(255,255,255,0) 60%),
+            radial-gradient(820px 360px at 100% 0%, rgba(238,244,255,0.7), rgba(255,255,255,0) 62%);
+        }
+        .hero-grid{
+          display:grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: 26px;
+          align-items: stretch;
+        }
+        @media (max-width: 920px){
+          .hero-grid{ grid-template-columns: 1fr; }
+        }
+
+        .hero-card{
+          background: rgba(255,255,255,0.9);
+          border: 1px solid rgba(226,232,240,0.9);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          padding: 26px;
+          overflow:hidden;
+          position: relative;
+        }
+
+        .kicker{
+          display:flex; gap: 8px; align-items:center;
+          font-size: 12px;
+          color: var(--muted);
+          letter-spacing: 0.01em;
+        }
+        .kicker-dot{ width: 8px; height: 8px; border-radius: 999px; background: rgba(30,79,134,0.22); border: 1px solid rgba(30,79,134,0.30); }
+
+        h1{
+          margin: 12px 0 10px;
+          font-family: Manrope, Inter, system-ui, sans-serif;
+          font-size: 44px;
+          line-height: 1.06;
+          letter-spacing: -0.03em;
+          color: var(--blue-900);
+        }
+        @media (max-width: 640px){ h1{ font-size: 36px; } }
+
+        .hero-tagline{
+          font-size: 18px;
+          color: var(--ink-2);
+          line-height: 1.55;
+          margin: 0 0 16px;
+          max-width: 52ch;
+        }
+
+        .hero-badges{
+          display:flex; flex-wrap:wrap; gap: 10px;
+          margin: 18px 0 18px;
+        }
+        .badge{
+          display:inline-flex; align-items:center; gap: 8px;
+          padding: 10px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(226,232,240,0.95);
+          background: rgba(248,250,252,0.92);
+          color: var(--ink-2);
+          font-size: 13px;
+        }
+
+        .hero-actions{ display:flex; gap: 12px; flex-wrap:wrap; margin-top: 18px; }
+
+        .hero-side{
+          border-radius: var(--radius);
+          overflow:hidden;
+          border: 1px solid rgba(226,232,240,0.9);
+          background: #F8FAFC;
+          box-shadow: var(--shadow-soft);
+          position: relative;
+          min-height: 340px;
+        }
+        .hero-img{
+          width: 100%; height: 100%;
+          object-fit: cover;
+          /* Keep the crop focused on the smile/teeth */
+          object-position: 50% 84%;
+          transform: scale(1.16);
+          transform-origin: 50% 65%;
+          display:block;
+          filter: saturate(1.18) contrast(1.06) brightness(1.06);
+        }
+        .hero-overlay{
+          position:absolute; inset: 0;
+          background: linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.78));
+          pointer-events:none;
+        }
+        .hero-side-card{
+          position:absolute; left: 14px; right: 14px; bottom: 14px;
+          background: rgba(255,255,255,0.86);
+          backdrop-filter: blur(18px);
+          border: 1px solid rgba(226,232,240,0.95);
+          border-radius: 16px;
+          padding: 14px;
+          display:flex; gap: 12px; align-items: flex-start;
+        }
+        .hero-side-card strong{ font-family: Manrope, Inter, system-ui, sans-serif; color: var(--blue-900); }
+        .hero-side-card p{ margin: 4px 0 0; font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+        .section{
+          padding: 54px 0;
+        }
+        .section.alt{ background: var(--surface-2); }
+
+        .section-head{
+          display:flex; align-items:flex-end; justify-content:space-between; gap: 18px;
+          margin-bottom: 20px;
+        }
+        .section h2{
+          margin: 0;
+          font-family: Manrope, Inter, system-ui, sans-serif;
+          font-size: 28px;
+          letter-spacing: -0.02em;
+          color: var(--blue-900);
+        }
+        .section .lead{
+          margin: 0;
+          color: var(--muted);
+          max-width: 64ch;
+          line-height: 1.6;
+          font-size: 15px;
+        }
+
+        .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+        @media (max-width: 880px){ .grid-2{ grid-template-columns: 1fr; } }
+
+        .card{
+          background: var(--surface);
+          border: 1px solid rgba(226,232,240,0.95);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-soft);
+          padding: 22px;
+        }
+
+        .about-wrap{ display:grid; grid-template-columns: 0.95fr 1.05fr; gap: 22px; align-items: stretch; }
+        @media (max-width: 920px){ .about-wrap{ grid-template-columns: 1fr; } }
+
+        .about-img{
+          border-radius: var(--radius);
+          overflow:hidden;
+          border: 1px solid rgba(226,232,240,0.9);
+          box-shadow: var(--shadow-soft);
+          background: #F8FAFC;
+          min-height: 320px;
+        }
+        .about-img img{ width:100%; height:100%; object-fit: cover; display:block; }
+
+        .about-body h3{
+          margin: 0 0 10px;
+          font-family: Manrope, Inter, system-ui, sans-serif;
+          font-size: 18px;
+          letter-spacing: -0.01em;
+          color: var(--ink);
+        }
+        .about-body p{ margin: 0 0 12px; color: var(--ink-2); line-height: 1.7; }
+        .about-body .sig{ font-family: "Libre Baskerville", Georgia, serif; color: var(--blue-900); margin-top: 12px; }
+
+        .services-grid{
+          display:grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+        }
+        @media (max-width: 1100px){ .services-grid{ grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px){ .services-grid{ grid-template-columns: 1fr; } }
+
+        .service{
+          padding: 18px;
+          border-radius: var(--radius);
+          border: 1px solid rgba(226,232,240,0.95);
+          background: rgba(255,255,255,0.95);
+          box-shadow: 0 10px 24px rgba(11,37,69,0.06);
+          transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
+          min-height: 156px;
+        }
+        .service:hover{ transform: translateY(-2px); border-color: rgba(30,79,134,0.22); box-shadow: 0 18px 40px rgba(11,37,69,0.10); }
+        .service h3{ margin: 0 0 8px; font-family: Manrope, Inter, system-ui, sans-serif; font-size: 16px; color: var(--blue-900); }
+        .service p{ margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+
+        .why-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        @media (max-width: 760px){ .why-grid{ grid-template-columns: 1fr; } }
+        .why-item{
+          display:flex; gap: 12px; align-items:flex-start;
+          padding: 18px;
+          border-radius: var(--radius);
+          border: 1px solid rgba(226,232,240,0.95);
+          background: rgba(255,255,255,0.9);
+        }
+        .why-icon{
+          width: 38px; height: 38px;
+          border-radius: 12px;
+          background: rgba(238,244,255,0.95);
+          border: 1px solid rgba(30,79,134,0.16);
+          display:flex; align-items:center; justify-content:center;
+          flex: 0 0 auto;
+        }
+        .why-item strong{ display:block; font-family: Manrope, Inter, system-ui, sans-serif; color: var(--ink); font-size: 15px; }
+        .why-item span{ display:block; color: var(--muted); font-size: 14px; margin-top: 4px; line-height: 1.55; }
+
+        .reviews-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media (max-width: 980px){ .reviews-grid{ grid-template-columns: 1fr; } }
+        .review{
+          background: rgba(248,250,252,0.94);
+          border: 1px solid rgba(226,232,240,0.95);
+          border-radius: var(--radius);
+          padding: 18px;
+          position: relative;
+          overflow:hidden;
+        }
+        .review:before{
+          content:"“";
+          position:absolute;
+          top: -8px; left: 12px;
+          font-family: "Libre Baskerville", Georgia, serif;
+          font-size: 64px;
+          color: rgba(11,37,69,0.10);
+          line-height: 1;
+        }
+        .review p{ margin: 18px 0 14px; color: var(--ink-2); line-height: 1.7; }
+        .review-meta{ display:flex; align-items:center; justify-content:space-between; gap: 12px; }
+        .stars{ letter-spacing: 0.12em; color: #B45309; font-size: 12px; }
+        .source{ font-size: 12px; color: var(--muted); }
+
+        .contact-wrap{ display:grid; grid-template-columns: 0.9fr 1.1fr; gap: 18px; align-items: stretch; }
+        @media (max-width: 920px){ .contact-wrap{ grid-template-columns: 1fr; } }
+
+        .contact-card{
+          background: rgba(255,255,255,0.9);
+          border: 1px solid rgba(226,232,240,0.95);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-soft);
+          padding: 20px;
+        }
+        .contact-row{ display:flex; align-items:flex-start; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px dashed rgba(226,232,240,0.9); }
+        .contact-row:last-child{ border-bottom: none; }
+        .label{ font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .value{ font-size: 15px; color: var(--ink); line-height: 1.5; }
+        .value a{ color: var(--blue-900); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+        .value a:hover{ color: var(--blue-800); }
+
+        .map{
+          border-radius: var(--radius);
+          overflow:hidden;
+          border: 1px solid rgba(226,232,240,0.95);
+          box-shadow: var(--shadow-soft);
+          background: #fff;
+          min-height: 360px;
+        }
+        .map iframe{ width: 100%; height: 100%; border: 0; display:block; }
+
+        footer{
+          padding: 28px 0 86px;
+          background: #0B2545;
+          color: rgba(255,255,255,0.9);
+        }
+        footer .foot-grid{ display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; }
+        @media (max-width: 780px){ footer .foot-grid{ grid-template-columns: 1fr; } }
+        .foot-title{ font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; }
+        .foot-muted{ color: rgba(255,255,255,0.72); margin: 0; line-height: 1.6; }
+        .foot-links{ display:flex; flex-wrap:wrap; gap: 10px; justify-content:flex-end; }
+        @media (max-width: 780px){ .foot-links{ justify-content:flex-start; } }
+        .foot-links a{
+          color: rgba(255,255,255,0.86);
+          border: 1px solid rgba(255,255,255,0.16);
+          padding: 10px 12px;
+          border-radius: 999px;
+          transition: background-color 180ms ease, border-color 180ms ease;
+        }
+        .foot-links a:hover{ background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.24); }
+        .copyright{ margin-top: 14px; color: rgba(255,255,255,0.65); font-size: 12px; }
+
+        /* Mobile sticky CTA */
+        .mobile-cta{
+          position: fixed;
+          left: 12px; right: 12px; bottom: 12px;
+          z-index: 60;
+          display:none;
+          gap: 10px;
+        }
+        .mobile-cta a{ flex:1; }
+        @media (max-width: 960px){
+          .mobile-cta{ display:flex; }
+        }
+
+        /* No section fade-in (removed per request) */
+      `}</style>
+
+      <a
+        data-testid="skip-to-content-link"
+        href="#main"
+        className="skip-link"
+        onClick={(e) => onNavClick(e, "main")}
+      >
+        Skip to content
+      </a>
+
+      <header data-testid="topbar" className="topbar">
+        <div className="container">
+          <div className="topbar-inner">
+            <div className="brand" data-testid="brand-block">
+              <div className="brand-name" data-testid="practice-name">
+                {PRACTICE.name}
+              </div>
+              <div className="brand-sub" data-testid="practice-type-location">
+                Endodontist (Root Canal Specialist) • San Jose, California
+              </div>
+            </div>
+
+            <nav className="nav" aria-label="Primary" data-testid="primary-nav">
+              <a data-testid="nav-about" href="#about" onClick={(e) => onNavClick(e, "about")}>
+                About
+              </a>
+              <a
+                data-testid="nav-services"
+                href="#services"
+                onClick={(e) => onNavClick(e, "services")}
+              >
+                Services
+              </a>
+              <a data-testid="nav-why" href="#why" onClick={(e) => onNavClick(e, "why")}>
+                Why Choose Us
+              </a>
+              {/* Reviews are linked externally via Google Maps; no on-page reviews section */}
+              <a
+                data-testid="nav-contact"
+                href="#contact"
+                onClick={(e) => onNavClick(e, "contact")}
+              >
+                Contact
+              </a>
+            </nav>
+
+            <div className="header-cta" data-testid="header-cta">
+              <a
+                data-testid="header-call-now-button"
+                className="btn btn-primary"
+                href={PRACTICE.phoneHref}
+                aria-label={`Call ${PRACTICE.phoneDisplay}`}
+              >
+                Call Now
+              </a>
+              <a
+                data-testid="header-directions-button"
+                className="btn btn-secondary"
+                href={PRACTICE.directionsHref}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Get directions"
+              >
+                Get Directions
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main id="main" data-testid="main">
+        <section data-testid="hero-section" className="hero" aria-label="Hero">
+          <div className="container">
+            <div className="hero-grid">
+              <div className="hero-card">
+                <div className="kicker" data-testid="hero-kicker">
+                  <span className="kicker-dot" aria-hidden="true" />
+                  Precision endodontics • Compassionate care
+                </div>
+                <h1 data-testid="hero-heading">{PRACTICE.tagline}</h1>
+                <p data-testid="hero-subheading" className="hero-tagline">
+                  Specialist-led care focused on relieving pain, saving natural teeth, and providing a calm,
+                  professional experience—right here in San Jose.
+                </p>
+
+                <div className="hero-badges" data-testid="hero-badges">
+                  <div className="badge" data-testid="badge-specialist">
+                    Root Canal Specialist
+                  </div>
+                  <div className="badge" data-testid="badge-doctor-credential">
+                    {PRACTICE.doctor}
+                  </div>
+                  <div className="badge" data-testid="badge-location">
+                    Convenient San Jose Location
+                  </div>
+                </div>
+
+                <div className="hero-actions" data-testid="hero-cta-buttons">
+                  <a
+                    data-testid="hero-call-now-button"
+                    className="btn btn-primary"
+                    href={PRACTICE.phoneHref}
+                    aria-label={`Call ${PRACTICE.phoneDisplay}`}
+                  >
+                    Call Now
+                  </a>
+                  <a
+                    data-testid="hero-directions-button"
+                    className="btn btn-secondary"
+                    href={PRACTICE.directionsHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Get directions"
+                  >
+                    Get Directions
+                  </a>
+                </div>
+              </div>
+
+              <aside data-testid="hero-image-panel" className="hero-side" aria-label="Clinic imagery">
+                <img
+                  data-testid="hero-image"
+                  className="hero-img"
+                  src="https://images.unsplash.com/photo-1769559893692-c6d0623bf8e4?auto=format&fit=crop&w=1400&q=80"
+                  alt="Close-up smiling mouth with lipstick"
+                  loading="lazy"
+                  width="1400"
+                  height="1000"
+                />
+                <div className="hero-overlay" aria-hidden="true" />
+                <div data-testid="hero-info-card" className="hero-side-card">
+                  <div aria-hidden="true" className="why-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2v6" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M12 16v6" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M4 12h6" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M14 12h6" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M12 16a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z" stroke="#0B2545" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong data-testid="hero-info-title">Modern technology, meticulous technique</strong>
+                    <p data-testid="hero-info-text">
+                      We combine advanced diagnostics with a patient-first approach to support comfortable, efficient care.
+                    </p>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section id="about" data-testid="about-section" className="section" aria-label="About us">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 data-testid="about-heading">About Us</h2>
+                <p data-testid="about-lead" className="lead">
+                  Learn more about our commitment to compassionate, expert endodontic care.
+                </p>
+              </div>
+            </div>
+
+            <div className="about-wrap">
+              <div className="about-img" data-testid="about-image-wrap" aria-label="Dental office interior">
+                <img
+                  data-testid="about-image"
+                  src="https://images.unsplash.com/photo-1704455306251-b4634215d98f?auto=format&fit=crop&w=1400&q=80"
+                  alt="Modern, clean dental office interior"
+                  loading="lazy"
+                  width="1400"
+                  height="1000"
+                />
+              </div>
+
+              <div className="card about-body" data-testid="about-card">
+                <h3 data-testid="about-doctor-name">{PRACTICE.doctor}</h3>
+                <p data-testid="about-paragraph-1">
+                  Dr. Gurpreet Narula, DDS provides specialist-focused endodontic care for patients seeking relief from tooth pain
+                  and treatment designed to preserve natural teeth through precise, thoughtful care.
+                </p>
+                <p data-testid="about-paragraph-2">
+                  Our approach is grounded in careful diagnosis, meticulous technique, and clear communication—so you understand
+                  your options, know what to expect, and feel supported from consultation through follow-up.
+                </p>
+                <p data-testid="about-education">
+                  He earned his dental degree from New York University (NYU) in 2001, completed two years of residency training in
+                  general dentistry, and then advanced his clinical expertise through specialty training in endodontics at NYU,
+                  graduating in 2005.
+                </p>
+                <p data-testid="about-paragraph-3">
+                  Whether you’re referred for root canal therapy or need an urgent endodontic evaluation, our team is here to
+                  provide timely, professional care focused on long-term comfort and outcomes.
+                </p>
+                <div data-testid="about-signature" className="sig">
+                  — {PRACTICE.doctor}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="services" data-testid="services-section" className="section alt" aria-label="Services">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 data-testid="services-heading">Services</h2>
+                <p data-testid="services-lead" className="lead">
+                  Specialized endodontic services for diagnosis, treatment, and emergency care.
+                </p>
+              </div>
+            </div>
+
+            <div className="services-grid" data-testid="services-grid">
+              <article className="service" data-testid="service-root-canal-therapy">
+                <h3>Root Canal Therapy</h3>
+                <p>Remove infection, reduce pain, and help preserve your natural tooth with precise, specialist-led care.</p>
+              </article>
+              <article className="service" data-testid="service-endodontic-retreatment">
+                <h3>Endodontic Retreatment & Microsurgery</h3>
+                <p>Re-evaluate and treat previously treated teeth to address persistent symptoms or new infection.</p>
+              </article>
+              <article className="service" data-testid="service-emergency-dental-care">
+                <h3>Emergency Dental Care</h3>
+                <p>Prompt evaluation for swelling, severe toothache, and other urgent endodontic concerns.</p>
+              </article>
+              <article className="service" data-testid="service-pain-diagnosis">
+                <h3>Pain Diagnosis</h3>
+                <p>Advanced diagnostic assessment to locate the source of pain and recommend the right treatment.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="why" data-testid="why-section" className="section" aria-label="Why choose us">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 data-testid="why-heading">Why Choose Us</h2>
+                <p data-testid="why-lead" className="lead">
+                  A calm, professional environment and specialist-level expertise focused on patient comfort.
+                </p>
+              </div>
+            </div>
+
+            <div className="why-grid" data-testid="why-grid">
+              <div className="why-item" data-testid="why-experienced-specialist">
+                <div className="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 21h8" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M12 17v4" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M7 10a5 5 0 1 1 10 0c0 2.1-1.1 3.1-2.1 4.1c-.8.8-1.4 1.4-1.7 2.4h-2.4c-.3-1-.9-1.6-1.7-2.4C8.1 13.1 7 12.1 7 10Z" stroke="#1E4F86" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Experienced Specialist</strong>
+                  <span>Endodontic-focused care tailored to complex root canal needs and pain relief.</span>
+                </div>
+              </div>
+
+              <div className="why-item" data-testid="why-modern-technology">
+                <div className="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 7h16" stroke="#1E4F86" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M7 4v6" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M17 4v6" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M6 20h12a2 2 0 0 0 2-2v-6H4v6a2 2 0 0 0 2 2Z" stroke="#1E4F86" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Modern Technology</strong>
+                  <span>Advanced tools and careful technique for accurate diagnosis and efficient treatment.</span>
+                </div>
+              </div>
+
+              <div className="why-item" data-testid="why-patient-focused-care">
+                <div className="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 21s-7-4.5-9-9a5.5 5.5 0 0 1 9-6a5.5 5.5 0 0 1 9 6c-2 4.5-9 9-9 9Z" stroke="#1E4F86" strokeWidth="2"/>
+                    <path d="M12 7v6" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M9 10h6" stroke="#0B2545" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Patient-Focused Care</strong>
+                  <span>Clear explanations, gentle chairside manner, and comfort-oriented treatment planning.</span>
+                </div>
+              </div>
+
+              <div className="why-item" data-testid="why-convenient-location">
+                <div className="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22s7-5 7-12a7 7 0 1 0-14 0c0 7 7 12 7 12Z" stroke="#1E4F86" strokeWidth="2"/>
+                    <path d="M12 11a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z" stroke="#0B2545" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Convenient San Jose Location</strong>
+                  <span>Easy-to-reach office near you, with quick access to directions and click-to-call support.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Reviews section removed per request; link to Google Maps reviews is in the footer. */}
+
+        <section id="contact" data-testid="contact-section" className="section" aria-label="Contact">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 data-testid="contact-heading">Contact</h2>
+                <p data-testid="contact-lead" className="lead">
+                  Call to schedule an appointment, or use directions to find us.
+                </p>
+              </div>
+            </div>
+
+            <div className="contact-wrap">
+              <div className="contact-card" data-testid="contact-card">
+                <div className="contact-row" data-testid="contact-address-row">
+                  <div>
+                    <div className="label">Address</div>
+                    <div className="value" data-testid="contact-address">
+                      <div>{PRACTICE.addressLines[0]}</div>
+                      <div>{PRACTICE.addressLines[1]}</div>
+                    </div>
+                  </div>
+                  <a
+                    data-testid="contact-directions-link"
+                    className="btn btn-secondary"
+                    href={PRACTICE.directionsHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Get directions"
+                  >
+                    Directions
+                  </a>
+                </div>
+
+                <div className="contact-row" data-testid="contact-phone-row">
+                  <div>
+                    <div className="label">Phone</div>
+                    <div className="value" data-testid="contact-phone">
+                      <a href={PRACTICE.phoneHref} aria-label={`Call ${PRACTICE.phoneDisplay}`}>
+                        {PRACTICE.phoneDisplay}
+                      </a>
+                    </div>
+                  </div>
+                  <a
+                    data-testid="contact-call-now-button"
+                    className="btn btn-primary"
+                    href={PRACTICE.phoneHref}
+                    aria-label={`Call ${PRACTICE.phoneDisplay}`}
+                  >
+                    Call
+                  </a>
+                </div>
+
+                <div className="contact-row" data-testid="contact-hours-row">
+                  <div style={{ width: "100%" }}>
+                    <div className="label">Office Hours</div>
+                    <div className="value" data-testid="contact-hours">
+                      {PRACTICE.hours.map((h) => (
+                        <div key={h.days} data-testid={`office-hours-${h.days.replace(/\s/g, "").toLowerCase()}`}>
+                          {h.days}: {h.hours}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="contact-row" data-testid="contact-note-row">
+                  <div style={{ width: "100%" }}>
+                    <div className="label">New Patients</div>
+                    <div className="value" data-testid="contact-note">
+                      If you are in pain, please call us to schedule an emergency appointment.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="map" data-testid="google-map-embed">
+                <iframe
+                  title="Google Map - Gurpreet Narula Dental Corporation"
+                  src={PRACTICE.mapEmbedSrc}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer data-testid="footer">
+          <div className="container">
+            <div className="foot-grid">
+              <div>
+                <p className="foot-title" data-testid="footer-practice-name">
+                  {PRACTICE.name}
+                </p>
+                <p className="foot-muted" data-testid="footer-address">
+                  {PRACTICE.addressLines[0]}, {PRACTICE.addressLines[1]}
+                </p>
+                <p className="foot-muted" data-testid="footer-phone">
+                  Phone: {PRACTICE.phoneDisplay}
+                </p>
+                <div className="copyright" data-testid="footer-copyright">
+                  © {year} {PRACTICE.name}. All rights reserved.
+                </div>
+              </div>
+
+              <div className="foot-links" data-testid="footer-links">
+                <a
+                  data-testid="footer-reviews-link"
+                  href={PRACTICE.directionsHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Open map directions"
+                >
+                  Get Directions
+                </a>
+                <a data-testid="footer-back-to-top" href="#main" onClick={(e) => onNavClick(e, "main")}>
+                  Back to Top
+                </a>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+        {/* Mobile sticky CTA removed per request (CTAs remain in header/hero/contact). */}
+        <div className="mobile-cta" data-testid="mobile-sticky-cta" style={{ display: "none" }} />
+      </main>
+    </div>
+  );
+};
+
+export default function App() {
+  return <DentalSite />;
+}
